@@ -1,0 +1,358 @@
+:root {
+    --bg-main: #f4f6f8;
+    --card-bg: #ffffff;
+    --text-main: #111827;
+    --text-muted: #4b5563;
+    --border-color: #d1d5db;
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --danger-color: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-main);
+    min-height: 100vh;
+    padding: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.app-container {
+    display: flex;
+    gap: 2rem;
+    max-width: 1000px;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+/* ================= Controls Panel ================= */
+.controls {
+    flex: 1;
+    min-width: 320px;
+    background: var(--card-bg);
+    padding: 1.5rem 1.5rem 2rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.brand {
+    margin-bottom: 0.25rem;
+}
+
+.brand h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.input-group {
+    margin-bottom: 1.25rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.calc-inputs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.calc-inputs input[type="text"] {
+    flex: 2;
+}
+
+.calc-inputs input[type="number"] {
+    flex: 1;
+}
+
+.secondary-btn {
+    background: var(--text-main);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 2.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.secondary-btn:hover {
+    background: #374151;
+}
+
+.order-list-control ul {
+    list-style: none;
+    margin-top: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    max-height: 180px;
+    overflow-y: auto;
+    background: #f9fafb;
+}
+
+.order-list-control li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.85rem;
+}
+
+.order-list-control li:last-child {
+    border-bottom: none;
+}
+
+.order-list-control li .remove-btn {
+    background: transparent;
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+    border-radius: 3px;
+    padding: 0.15rem 0.4rem;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.order-list-control li .remove-btn:hover {
+    background: var(--danger-color);
+    color: white;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+}
+
+.primary-btn:hover {
+    background: var(--primary-hover);
+}
+
+.primary-btn:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+}
+
+/* ================= Preview Panel (Receipt) ================= */
+.preview-container {
+    flex: 1.5;
+    min-width: 400px;
+    display: flex;
+    justify-content: center;
+}
+
+.receipt {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #000;
+}
+
+.receipt-logo {
+    max-width: 80px;
+    height: auto;
+    margin-bottom: 0.5rem;
+}
+
+.receipt-header h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.receipt-header .tagline {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.receipt-body {
+    margin-bottom: 1.5rem;
+}
+
+.customer-code-block {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.customer-code-block span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.customer-code-block strong {
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.qris-inline {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.qris-inline img {
+    max-width: 220px;
+    border: 1px solid var(--border-color);
+    padding: 0.25rem;
+    background: #fff;
+}
+
+.greeting, .process-msg, .closing-msg {
+    margin-bottom: 1rem;
+}
+
+.greeting {
+    font-weight: 500;
+}
+
+.list-section {
+    margin: 1.5rem 0;
+    border-top: 1px dashed #000;
+    border-bottom: 1px dashed #000;
+    padding: 1rem 0;
+}
+
+.list-section .section-title {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.joki-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+}
+
+.total-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.payment-section, .promo-section {
+    margin-bottom: 1.25rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.inline-icon {
+    vertical-align: text-bottom;
+    margin-right: 0.4rem;
+    color: var(--text-main);
+}
+
+.receipt-footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #000;
+}
+
+.receipt-footer .link {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* ================= Responsive ================= */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+    .app-container {
+        flex-direction: column;
+    }
+    .preview-container {
+        min-width: 100%;
+    }
+    .receipt {
+        padding: 1.5rem;
+    }
+}
