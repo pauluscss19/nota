@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Joki Kilat</title>
+    <link rel="stylesheet" href="admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Bar -->
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="topbar-left">
+                <h1>📊 Admin Panel</h1>
+                <span class="topbar-badge">Joki Kilat</span>
+            </div>
+            <a href="index.html" class="back-link">← Kembali ke Generator Nota</a>
+        </div>
+    </header>
+
+    <main class="admin-container">
+        <!-- Dashboard Cards -->
+        <section class="dashboard-cards">
+            <div class="card card-blue">
+                <div class="card-icon">💰</div>
+                <div class="card-info">
+                    <span class="card-label">Total Pendapatan</span>
+                    <span class="card-value" id="totalRevenue">0K</span>
+                </div>
+            </div>
+            <div class="card card-green">
+                <div class="card-icon">📅</div>
+                <div class="card-info">
+                    <span class="card-label">Pendapatan Bulan Ini</span>
+                    <span class="card-value" id="monthRevenue">0K</span>
+                </div>
+            </div>
+            <div class="card card-purple">
+                <div class="card-icon">📋</div>
+                <div class="card-info">
+                    <span class="card-label">Total Transaksi</span>
+                    <span class="card-value" id="totalTransactions">0</span>
+                </div>
+            </div>
+            <div class="card card-orange">
+                <div class="card-icon">🔥</div>
+                <div class="card-info">
+                    <span class="card-label">Transaksi Bulan Ini</span>
+                    <span class="card-value" id="monthTransactions">0</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chart Section -->
+        <section class="chart-section">
+            <div class="section-header">
+                <h2>📈 Grafik Pendapatan (6 Bulan Terakhir)</h2>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Transaction Table -->
+        <section class="table-section">
+            <div class="section-header">
+                <h2>📑 Riwayat Transaksi</h2>
+                <div class="table-actions">
+                    <input type="text" id="searchInput" placeholder="🔍 Cari kode customer..." class="search-input">
+                    <select id="filterMonth" class="filter-select">
+                        <option value="all">Semua Bulan</option>
+                    </select>
+                    <button id="exportBtn" class="btn btn-export">📥 Export CSV</button>
+                    <button id="clearAllBtn" class="btn btn-danger">🗑️ Hapus Semua</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="transactionTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Kode Customer</th>
+                            <th>Pesanan</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Rows rendered by JS -->
+                    </tbody>
+                </table>
+                <div id="emptyState" class="empty-state" style="display:none;">
+                    <p>📭 Belum ada transaksi.</p>
+                    <p class="empty-sub">Download nota di halaman generator untuk mulai mencatat.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="summary-section">
+            <div class="section-header">
+                <h2>📊 Rekap Bulanan</h2>
+            </div>
+            <div class="summary-table-wrapper">
+                <table id="summaryTable">
+                    <thead>
+                        <tr>
+                            <th>Bulan</th>
+                            <th>Jumlah Transaksi</th>
+                            <th>Lunas</th>
+                            <th>Belum Bayar</th>
+                            <th>Total Pendapatan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryBody">
+                        <!-- Rows rendered by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>

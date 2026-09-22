@@ -105,8 +105,28 @@ document.addEventListener('DOMContentLoaded', () => {
         displayCustomerCode.textContent = value || '-';
     });
 
+    // Fungsi untuk menyimpan transaksi ke localStorage (otomatis saat download nota)
+    function saveTransaction() {
+        const transactions = JSON.parse(localStorage.getItem('jokikilat_transactions') || '[]');
+        const custCode = customerCodeInput.value.trim() || 'Baru';
+        let total = 0;
+        items.forEach(item => { total += item.price; });
+
+        const transaction = {
+            id: 'TXN-' + Date.now(),
+            customerCode: custCode,
+            items: items.map(item => ({ name: item.name, price: item.price })),
+            total: total,
+            date: new Date().toISOString(),
+            status: 'belum_bayar'
+        };
+
+        transactions.push(transaction);
+        localStorage.setItem('jokikilat_transactions', JSON.stringify(transactions));
+    }
+
     // 4. Proses Download Nota menjadi Gambar (JPG) menggunakan html2canvas
-    downloadBtn.addEventListener('click', () => {
+    downloadBtn.addEventListener('click', async () => {
         // Cek jika list kosong
         if (items.length === 0) {
             const confirmEmpty = confirm('Daftar pesanan masih kosong. Yakin ingin mengunduh nota?');
@@ -118,34 +138,58 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadBtn.innerHTML = 'Memproses...';
         downloadBtn.disabled = true;
 
-        // html2canvas config
-        html2canvas(receiptCard, {
-            scale: 2, // Resolusi tinggi (Retina)
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            logging: false
-        }).then(canvas => {
+        try {
+            // Swap gambar ke base64 agar tidak kena CORS (baik di file:// maupun https://)
+            const images = receiptCard.querySelectorAll('img');
+            const originalSrcs = [];
+            images.forEach(img => {
+                originalSrcs.push(img.src);
+                if (typeof IMAGES_BASE64 !== 'undefined') {
+                    if (img.src.includes('logo')) {
+                        img.src = IMAGES_BASE64.logo;
+                    } else if (img.src.includes('qris')) {
+                        img.src = IMAGES_BASE64.qris;
+                    }
+                }
+            });
+
+            // Tunggu sebentar agar gambar base64 ter-render
+            await new Promise(r => setTimeout(r, 100));
+
+            // html2canvas config
+            const canvas = await html2canvas(receiptCard, {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                logging: false
+            });
+
+            // Restore gambar asli
+            images.forEach((img, i) => { img.src = originalSrcs[i]; });
+
             // Konversi canvas ke image URL
             const imageUrl = canvas.toDataURL('image/jpeg', 0.95);
-            
+
             // Buat elemen anchor sementara untuk trigger download
             const link = document.createElement('a');
             const custCode = customerCodeInput.value.trim() || 'Baru';
             link.download = `Nota_JokiKilat_${custCode}.jpg`;
             link.href = imageUrl;
             link.click();
-            
+
+            // Simpan transaksi ke laporan keuangan (otomatis)
+            saveTransaction();
+
             // Kembalikan state tombol
             downloadBtn.innerHTML = originalText;
             downloadBtn.disabled = false;
-        }).catch(err => {
+        } catch (err) {
             console.error('Error saat men-generate gambar:', err);
             alert('Terjadi kesalahan saat memproses nota. Silakan coba lagi.');
-            
+
             // Kembalikan state tombol
             downloadBtn.innerHTML = originalText;
             downloadBtn.disabled = false;
-        });
+        }
     });
 
     // Inisialisasi tampilan list kosong
