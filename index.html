@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- html2canvas for capturing image -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Mammoth.js for parsing docx -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -24,6 +26,15 @@
             <div class="input-group">
                 <label for="customerCode">Kode Customer</label>
                 <input type="text" id="customerCode" placeholder="Contoh: JK-001">
+            </div>
+
+            <!-- Cek Harga Otomatis -->
+            <div class="input-group">
+                <label>Rekomendasi Harga (Upload Dokumen)</label>
+                <div class="calc-inputs" style="flex-direction: column; gap: 8px;">
+                    <input type="file" id="docUpload" accept=".txt,.doc,.docx" style="font-size: 0.9rem; padding: 0.4rem;">
+                    <div id="docResult" style="font-size: 0.9rem; color: #4f46e5; font-weight: 600; display: none;"></div>
+                </div>
             </div>
             
             <!-- Kalkulator Section -->
@@ -126,6 +137,10 @@
     </div>
 
     <!-- Script JavaScript -->
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
     <script src="images.js"></script>
     <script src="script.js"></script>
 </body>

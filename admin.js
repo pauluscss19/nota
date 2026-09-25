@@ -1,13 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ================= DATA LAYER =================
-    const STORAGE_KEY = 'jokikilat_transactions';
+    // ================= DATA LAYER (FIREBASE) =================
+    let transactionsData = [];
 
-    function getTransactions() {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    // Real-time listener for Firestore
+    if (typeof db !== 'undefined') {
+        db.collection('transactions').onSnapshot((snapshot) => {
+            const transactions = [];
+            snapshot.forEach((doc) => {
+                transactions.push({ id: doc.id, ...doc.data() });
+            });
+            transactionsData = transactions;
+            refreshAll(); // Perbarui UI setiap ada perubahan data
+        });
+    } else {
+        alert("Firebase tidak terhubung.");
     }
 
-    function saveTransactions(transactions) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+    function getTransactions() {
+        return transactionsData;
     }
 
     // ================= DOM REFERENCES =================
@@ -173,24 +183,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const action = btn.dataset.action;
         const id = btn.dataset.id;
-        let transactions = getTransactions();
 
         if (action === 'toggle-status') {
-            transactions = transactions.map(t => {
-                if (t.id === id) {
-                    t.status = t.status === 'lunas' ? 'belum_bayar' : 'lunas';
-                }
-                return t;
-            });
-            saveTransactions(transactions);
-            refreshAll();
+            const t = transactionsData.find(t => t.id === id);
+            if (t) {
+                const newStatus = t.status === 'lunas' ? 'belum_bayar' : 'lunas';
+                db.collection('transactions').doc(id).update({ status: newStatus });
+            }
         }
 
         if (action === 'delete') {
             if (confirm('Hapus transaksi ini?')) {
-                transactions = transactions.filter(t => t.id !== id);
-                saveTransactions(transactions);
-                refreshAll();
+                db.collection('transactions').doc(id).delete();
             }
         }
     });
@@ -201,14 +205,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ================= CLEAR ALL =================
     clearAllBtn.addEventListener('click', () => {
-        const transactions = getTransactions();
-        if (transactions.length === 0) {
+        if (transactionsData.length === 0) {
             alert('Tidak ada data untuk dihapus.');
             return;
         }
-        if (confirm(`Yakin ingin menghapus semua ${transactions.length} transaksi? Data tidak bisa dikembalikan.`)) {
-            localStorage.removeItem(STORAGE_KEY);
-            refreshAll();
+        if (confirm(`Yakin ingin menghapus semua ${transactionsData.length} transaksi? Data tidak bisa dikembalikan.`)) {
+            const batch = db.batch();
+            transactionsData.forEach(t => {
+                batch.delete(db.collection('transactions').doc(t.id));
+            });
+            batch.commit().then(() => {
+                console.log('Semua transaksi dihapus');
+            }).catch(err => {
+                console.error(err);
+            });
         }
     });
 

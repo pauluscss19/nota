@@ -105,15 +105,13 @@ document.addEventListener('DOMContentLoaded', () => {
         displayCustomerCode.textContent = value || '-';
     });
 
-    // Fungsi untuk menyimpan transaksi ke localStorage (otomatis saat download nota)
-    function saveTransaction() {
-        const transactions = JSON.parse(localStorage.getItem('jokikilat_transactions') || '[]');
+    // Fungsi untuk menyimpan transaksi ke Firebase (otomatis saat download nota)
+    async function saveTransaction() {
         const custCode = customerCodeInput.value.trim() || 'Baru';
         let total = 0;
         items.forEach(item => { total += item.price; });
 
         const transaction = {
-            id: 'TXN-' + Date.now(),
             customerCode: custCode,
             items: items.map(item => ({ name: item.name, price: item.price })),
             total: total,
@@ -121,8 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
             status: 'belum_bayar'
         };
 
-        transactions.push(transaction);
-        localStorage.setItem('jokikilat_transactions', JSON.stringify(transactions));
+        try {
+            await db.collection('transactions').add(transaction);
+            console.log('Transaksi berhasil disimpan ke Firebase!');
+        } catch (error) {
+            console.error('Error menyimpan ke Firebase:', error);
+            alert('Gagal menyimpan data ke server. Pastikan Firebase Config sudah benar.');
+        }
     }
 
     // 4. Proses Download Nota menjadi Gambar (JPG) menggunakan html2canvas
@@ -177,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             link.click();
 
             // Simpan transaksi ke laporan keuangan (otomatis)
-            saveTransaction();
+            await saveTransaction();
 
             // Kembalikan state tombol
             downloadBtn.innerHTML = originalText;
@@ -191,6 +194,96 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadBtn.disabled = false;
         }
     });
+
+    // ================= FITUR REKOMENDASI HARGA =================
+    const docUpload = document.getElementById('docUpload');
+    const docResult = document.getElementById('docResult');
+
+    function calculateRecommendedPrice(wordCount) {
+        if (wordCount <= 300) {
+            return 10;
+        } else if (wordCount <= 500) {
+            // Dari 300 ke 500 (selisih 200 kata) harganya naik 5K
+            const rate = 5 / 200; 
+            const price = 10 + ((wordCount - 300) * rate);
+            return Math.round(price);
+        } else if (wordCount <= 3000) {
+            // Dari 500 ke 3000 harganya naik 10K per 500 kata
+            const rate = 10 / 500;
+            const price = 15 + ((wordCount - 500) * rate);
+            return Math.round(price);
+        } else {
+            // Di atas 3000 kata harganya naik 5K per 500 kata
+            const rate = 5 / 500;
+            const price = 65 + ((wordCount - 3000) * rate);
+            return Math.round(price);
+        }
+    }
+
+    function countWords(text) {
+        // Hapus whitespace berlebih dan hitung kata
+        const words = text.trim().split(/\s+/);
+        return text.trim() === '' ? 0 : words.length;
+    }
+
+    if (docUpload) {
+        docUpload.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) {
+                docResult.style.display = 'none';
+                return;
+            }
+
+            docResult.style.display = 'block';
+            docResult.textContent = 'Membaca dokumen...';
+            docResult.style.color = '#4f46e5';
+
+            try {
+                let text = '';
+
+                if (file.name.endsWith('.txt')) {
+                    // Ekstrak teks dari file .txt
+                    text = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.onerror = (e) => reject(e);
+                        reader.readAsText(file);
+                    });
+                } else if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+                    // Ekstrak teks dari file .docx menggunakan mammoth
+                    if (typeof mammoth === 'undefined') {
+                        throw new Error("Library Mammoth.js belum dimuat.");
+                    }
+                    const arrayBuffer = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.onerror = (e) => reject(e);
+                        reader.readAsArrayBuffer(file);
+                    });
+
+                    const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                    text = result.value;
+                } else {
+                    throw new Error("Format file tidak didukung. Harap upload .txt atau .docx");
+                }
+
+                const wordCount = countWords(text);
+                const price = calculateRecommendedPrice(wordCount);
+
+                docResult.innerHTML = `Jumlah Kata: <strong>${wordCount} kata</strong> <br/> Rekomendasi Harga: <strong>${price}K</strong>`;
+                docResult.style.color = '#059669'; // Hijau sukses
+
+                // Otomatis isi ke form
+                itemNameInput.value = `Tugas (${wordCount} kata)`;
+                itemPriceInput.value = price; 
+                
+            } catch (err) {
+                console.error(err);
+                docResult.textContent = `Error: ${err.message}`;
+                docResult.style.color = '#dc2626'; // Merah error
+            }
+        });
+    }
 
     // Inisialisasi tampilan list kosong
     renderList();
